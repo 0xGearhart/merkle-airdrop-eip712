@@ -19,6 +19,8 @@ contract Deploy is Script, CodeConstants {
         vm.startBroadcast(config.account);
         airdropToken = new AirdropToken(TOKEN_NAME, TOKEN_SYMBOL, INITIAL_SUPPLY);
         merkleAirdrop = new MerkleAirdrop(address(airdropToken), config.merkleRoot);
+        bool success = airdropToken.transfer(address(merkleAirdrop), INITIAL_SUPPLY);
+        success;
         vm.stopBroadcast();
     }
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-import {Script, console2} from "forge-std/Script.sol";
+import {Script} from "forge-std/Script.sol";
 
 pragma solidity ^0.8.27;
 
@@ -18,7 +18,7 @@ contract CodeConstants {
     uint256 constant ARB_MAINNET_CHAIN_ID = 42_161;
     uint256 constant ARB_SEPOLIA_CHAIN_ID = 421_614;
 
-    bytes32 constant LOCAL_MERKLE_ROOT = 0xaa5d581231e596618465a56aa0f5870ba6e20785fe436d5bfb82b08662ccc7c4;
+    bytes32 constant LOCAL_MERKLE_ROOT = 0xaa2b3d9448522a0dd0d6ffaa3d8da42e48dee685aa98d4484d774a14fc48a74f;
 }
 
 contract HelperConfig is Script, CodeConstants {
