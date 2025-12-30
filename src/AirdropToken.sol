@@ -6,7 +6,7 @@ pragma solidity ^0.8.27;
 
 /**
  * @title AirdropToken
- * @author Dustin Gearhart
+ * @author Gearhart
  * @notice Token to be claimed from MerkleAirdrop
  */
 contract AirdropToken is ERC20 {

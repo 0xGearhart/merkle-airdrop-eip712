@@ -7,7 +7,7 @@ pragma solidity ^0.8.27;
 
 /**
  * @title MerkleAirdrop
- * @author Dustin Gearhart
+ * @author Gearhart
  * @notice Airdrop claim contract that uses a merkle tree to minimize gas expenditure
  */
 contract MerkleAirdrop {
