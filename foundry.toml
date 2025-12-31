@@ -7,9 +7,13 @@ libs = ["lib"]
 remappings = [
     "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
     "@murky/=lib/murky/",
+    "@devops=lib/foundry-devops/src/",
 ]
 fs_permissions = [
-    { access = "read-write", path = "./script/target/" },
+    { access = "read-write", path = "./script/target/inputLocal.json" },
+    { access = "read-write", path = "./script/target/input.json" },
+    { access = "write", path = "./script/target/outputLocal.json" },
+    { access = "write", path = "./script/target/output.json" },
     { access = "read", path = "./broadcast" },
     { access = "read", path = "./reports" },
 ]

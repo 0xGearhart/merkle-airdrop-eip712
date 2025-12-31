@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: all clean remove install update snapshot coverageReport gasReport anvil deploy airdrop
+.PHONY: all clean remove install update snapshot coverageReport gasReport anvil deploy airdrop merkle
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
@@ -12,7 +12,7 @@ clean  :; forge clean
 # Remove modules
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
-install :; forge install cyfrin/foundry-devops@0.2.2 && forge install foundry-rs/forge-std@v1.11.0 && forge install openzeppelin/openzeppelin-contracts@v5.5.0 
+install :; forge install cyfrin/foundry-devops@0.2.2 && forge install foundry-rs/forge-std@v1.11.0 && forge install openzeppelin/openzeppelin-contracts@v5.5.0 && forge install dmfxyz/murky@v0.1.0
 
 # Update Dependencies
 update:; forge update
@@ -46,8 +46,13 @@ ifeq ($(findstring --network arb sepolia,$(ARGS)),--network arb sepolia)
 	NETWORK_ARGS := --rpc-url $(ARB_SEPOLIA_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 endif
 
+# deploy airdrop token and airdrop claim contract
 deploy:
 	@forge script script/Deploy.s.sol:Deploy $(NETWORK_ARGS)
 
 airdrop:
 	@ forge script script/Interactions.s.sol:Airdrop $(NETWORK_ARGS)
+
+# Generate input in json format with GenerateInput script and save to input.json file then build merkle tree from generated input with MerkleBuilder script and save to output.json file
+merkle:
+	@ forge script script/GenerateInput.s.sol:GenerateInput && forge script script/MerkleBuilder.s.sol:MerkleBuilder
