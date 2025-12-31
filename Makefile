@@ -46,6 +46,14 @@ ifeq ($(findstring --network arb sepolia,$(ARGS)),--network arb sepolia)
 	NETWORK_ARGS := --rpc-url $(ARB_SEPOLIA_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 endif
 
+ifeq ($(findstring --network base MAINNET,$(ARGS)),--network base MAINNET)
+	NETWORK_ARGS := --rpc-url $(BASE_MAINNET_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+endif
+
+ifeq ($(findstring --network base sepolia,$(ARGS)),--network base sepolia)
+	NETWORK_ARGS := --rpc-url $(BASE_SEPOLIA_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+endif
+
 # deploy airdrop token and airdrop claim contract
 deploy:
 	@forge script script/Deploy.s.sol:Deploy $(NETWORK_ARGS)

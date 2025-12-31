@@ -20,6 +20,8 @@ contract CodeConstants {
     uint256 constant ETH_SEPOLIA_CHAIN_ID = 11_155_111;
     uint256 constant ARB_MAINNET_CHAIN_ID = 42_161;
     uint256 constant ARB_SEPOLIA_CHAIN_ID = 421_614;
+    uint256 constant BASE_MAINNET_CHAIN_ID = 8453;
+    uint256 constant BASE_SEPOLIA_CHAIN_ID = 84_532;
 
     // merkle airdrop contract info
     bytes32 constant LOCAL_MERKLE_ROOT = 0xaa2b3d9448522a0dd0d6ffaa3d8da42e48dee685aa98d4484d774a14fc48a74f;
@@ -37,20 +39,20 @@ contract HelperConfig is Script, CodeConstants {
         bytes32 merkleRoot;
     }
 
-    NetworkConfig public localNetworkConfig;
     mapping(uint256 chainid => NetworkConfig) public networkConfigs;
 
     constructor() {
+        networkConfigs[LOCAL_CHAIN_ID] = _getLocalConfig();
         networkConfigs[ETH_MAINNET_CHAIN_ID] = _getEthMainnetConfig();
         networkConfigs[ETH_SEPOLIA_CHAIN_ID] = _getEthSepoliaConfig();
         networkConfigs[ARB_MAINNET_CHAIN_ID] = _getArbMainnetConfig();
         networkConfigs[ARB_SEPOLIA_CHAIN_ID] = _getArbSepoliaConfig();
+        networkConfigs[BASE_MAINNET_CHAIN_ID] = _getBaseMainnetConfig();
+        networkConfigs[BASE_SEPOLIA_CHAIN_ID] = _getBaseSepoliaConfig();
     }
 
     function getNetworkConfig() public returns (NetworkConfig memory) {
-        if (block.chainid == LOCAL_CHAIN_ID) {
-            return _getOrCreateLocalConfig();
-        } else if (networkConfigs[block.chainid].account != address(0)) {
+        if (networkConfigs[block.chainid].account != address(0)) {
             return networkConfigs[block.chainid];
         } else {
             revert HelperConfig__InvalidNetwork(block.chainid);
@@ -73,18 +75,15 @@ contract HelperConfig is Script, CodeConstants {
         return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
     }
 
-    function _getOrCreateLocalConfig() public returns (NetworkConfig memory) {
-        // if mocks are already deployed, return struct
-        if (localNetworkConfig.account != address(0)) {
-            return localNetworkConfig;
-        }
-        // // otherwise, deploy mocks and save struct
-        // console2.log("Deploying mocks...");
-        // vm.startBroadcast(ANVIL_DEFAULT_ACCOUNT);
-        // vm.stopBroadcast();
+    function _getBaseMainnetConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+    }
 
-        localNetworkConfig = NetworkConfig({account: ANVIL_DEFAULT_ACCOUNT, merkleRoot: LOCAL_MERKLE_ROOT});
+    function _getBaseSepoliaConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+    }
 
-        return localNetworkConfig;
+    function _getLocalConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({account: ANVIL_DEFAULT_ACCOUNT, merkleRoot: LOCAL_MERKLE_ROOT});
     }
 }
