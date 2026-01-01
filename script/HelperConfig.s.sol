@@ -24,11 +24,21 @@ contract CodeConstants {
     uint256 constant BASE_SEPOLIA_CHAIN_ID = 84_532;
 
     // merkle airdrop contract info
-    bytes32 constant LOCAL_MERKLE_ROOT = 0xaa2b3d9448522a0dd0d6ffaa3d8da42e48dee685aa98d4484d774a14fc48a74f;
-    bytes32 constant MERKLE_ROOT = 0x947c42541535f83c00b2fa82c52c26e6399392856adc342af2b559346b48fa8b;
-    uint256 constant AIRDROP_CLAIM_AMOUNT = 25 ether;
     string constant EIP712_DAPP_NAME = "MerkleAirdrop";
     string constant EIP712_DAPP_VERSION = "v1.0";
+    uint256 constant AIRDROP_CLAIM_AMOUNT = 25 ether;
+    bytes32 constant LOCAL_MERKLE_ROOT = 0xaa2b3d9448522a0dd0d6ffaa3d8da42e48dee685aa98d4484d774a14fc48a74f;
+    bytes32 constant MERKLE_ROOT = 0x947c42541535f83c00b2fa82c52c26e6399392856adc342af2b559346b48fa8b;
+    bytes32[] LOCAL_MERKLE_PROOF = [
+        bytes32(0x0c7ef881bb675a5858617babe0eb12b538067e289d35d5b044ee76b79d335191),
+        bytes32(0x04a0dd9684f371cb72c8dbe0c219550e1ce8c81b96d9cc582d4a3631e1d06172),
+        bytes32(0x2aadccb0553b8c9968b78ca32bb891c1dd527eb553ff5b19aa35560e4757e5b0)
+    ];
+    bytes32[] MERKLE_PROOF = [
+        bytes32(0xe6ee55273b67b99988e64ab56db4de62eb12f7c730f92f924530c6123c1e90b3),
+        bytes32(0xf4216065bf6ac971b2f1ba0fef5920345dcaeceabf5f200030a1cd530dd44a89),
+        bytes32(0x2aadccb0553b8c9968b78ca32bb891c1dd527eb553ff5b19aa35560e4757e5b0)
+    ];
 }
 
 contract HelperConfig is Script, CodeConstants {
@@ -37,6 +47,7 @@ contract HelperConfig is Script, CodeConstants {
     struct NetworkConfig {
         address account;
         bytes32 merkleRoot;
+        bytes32[] merkleProof;
     }
 
     mapping(uint256 chainid => NetworkConfig) public networkConfigs;
@@ -51,7 +62,7 @@ contract HelperConfig is Script, CodeConstants {
         networkConfigs[BASE_SEPOLIA_CHAIN_ID] = _getBaseSepoliaConfig();
     }
 
-    function getNetworkConfig() public returns (NetworkConfig memory) {
+    function getNetworkConfig() public view returns (NetworkConfig memory) {
         if (networkConfigs[block.chainid].account != address(0)) {
             return networkConfigs[block.chainid];
         } else {
@@ -60,30 +71,45 @@ contract HelperConfig is Script, CodeConstants {
     }
 
     function _getEthMainnetConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+        return NetworkConfig({
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT, merkleProof: MERKLE_PROOF
+        });
     }
 
     function _getEthSepoliaConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+        return NetworkConfig({
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT, merkleProof: MERKLE_PROOF
+        });
     }
 
     function _getArbMainnetConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+        return NetworkConfig({
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT, merkleProof: MERKLE_PROOF
+        });
     }
 
     function _getArbSepoliaConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+        return NetworkConfig({
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT, merkleProof: MERKLE_PROOF
+        });
     }
 
     function _getBaseMainnetConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+        return NetworkConfig({
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT, merkleProof: MERKLE_PROOF
+        });
     }
 
     function _getBaseSepoliaConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT});
+        return NetworkConfig({
+            account: vm.envAddress("DEFAULT_KEY_ADDRESS"), merkleRoot: MERKLE_ROOT, merkleProof: MERKLE_PROOF
+        });
     }
 
     function _getLocalConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({account: ANVIL_DEFAULT_ACCOUNT, merkleRoot: LOCAL_MERKLE_ROOT});
+        return
+            NetworkConfig({
+                account: ANVIL_DEFAULT_ACCOUNT, merkleRoot: LOCAL_MERKLE_ROOT, merkleProof: LOCAL_MERKLE_PROOF
+            });
     }
 }
