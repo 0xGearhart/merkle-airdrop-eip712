@@ -66,6 +66,9 @@ contract MerkleAirdrop is EIP712 {
      * @param account address of account claiming tokens
      * @param amount amount of tokens to be claimed
      * @param merkleProof merkle proof to verify account is eligible to claim
+     * @param v uint8 v component of signature
+     * @param r bytes32 r component of signature
+     * @param s bytes32 s component of signature
      */
     function claim(
         address account,
@@ -86,6 +89,8 @@ contract MerkleAirdrop is EIP712 {
             revert MerkleAirdrop__InvalidSignature();
         }
         // generate leaf
+        // this method is very gas inefficient. Using assembly or EfficientHashLib from Solady is suggested for production.
+        // will leave as is for verbosity and demonstration purposes
         bytes32 merkleLeaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount))));
         // verify merkle proof
         if (!MerkleProof.verify(merkleProof, i_merkleRoot, merkleLeaf)) {
@@ -127,18 +132,18 @@ contract MerkleAirdrop is EIP712 {
     }
 
     /**
-     * @notice Get Airdrop Token address
-     */
-    function getAirdropToken() external view returns (address) {
-        return address(i_airdropToken);
-    }
-
-    /**
      * @notice Get claim status for a specific account
      * @param account address of account to get claim status for
      */
     function getClaimStatus(address account) external view returns (bool) {
         return s_hasClaimed[account];
+    }
+
+    /**
+     * @notice Get Airdrop Token address
+     */
+    function getAirdropToken() external view returns (address) {
+        return address(i_airdropToken);
     }
 
     /**
