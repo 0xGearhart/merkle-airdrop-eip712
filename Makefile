@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: all clean remove install update snapshot coverageReport gasReport anvil deploy claimAirdrop merkle
+.PHONY: all clean remove install update snapshot coverageReport gasReport anvil deploy claimAirdrop getDigest signDigest merkle
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
@@ -54,13 +54,31 @@ ifeq ($(findstring --network base sepolia,$(ARGS)),--network base sepolia)
 	NETWORK_ARGS := --rpc-url $(BASE_SEPOLIA_RPC_URL) --account defaultKey --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 endif
 
+# Generate input in json format with GenerateInput script and save to input.json file then build merkle tree from generated input with MerkleBuilder script and save to output.json file
+merkle:
+	@forge script script/GenerateInput.s.sol:GenerateInput && forge script script/MerkleBuilder.s.sol:MerkleBuilder
+
 # deploy airdrop token and airdrop claim contract
 deploy:
 	@forge script script/Deploy.s.sol:Deploy $(NETWORK_ARGS)
 
+# for streamlined digest creation, signing, and claiming programmatically
 claimAirdrop:
 	@forge script script/Interactions.s.sol:ClaimAirdrop $(NETWORK_ARGS)
 
-# Generate input in json format with GenerateInput script and save to input.json file then build merkle tree from generated input with MerkleBuilder script and save to output.json file
-merkle:
-	@forge script script/GenerateInput.s.sol:GenerateInput && forge script script/MerkleBuilder.s.sol:MerkleBuilder
+# for use with full bytes signature object that needs to be split into v, r, and s components before claim
+# get full signature for this script with make targets below (getDigest, signDigest)
+claimAirdropWithUnsplitSignature:
+	@forge script script/Interactions.s.sol:ClaimAirdropWithUnsplitSignature $(NETWORK_ARGS)
+
+# get hashed message digest with forge cast. Hardcoded for anvil default sender as example. Modify and use in terminal as needed
+# parameters => address of deployed MerkleAirdrop contract to call, function sig to be called("getDigest(address,uint256)"), whitelisted claiming address, amount to claim, rpc url to execute call on
+getDigest:
+	cast call 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "getDigest(address,uint256)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 25000000000000000000 --rpc-url http://localhost:8545
+
+# using output from getDigest above ^. Hardcoded for anvil default sender as example. Modify and use in terminal as needed
+# --no-hash since digest is already hashed in getDigest call before signing
+# DO NOT USE PRIVATE KEY IN PLAIN TEXT OUTSIDE OF ANVIL DEFAULT ACCOUNTS. Replace with --account defaultKey when using encrypted keys
+# ignore "0x" prefix of signature output when copying to use in ClaimAirdropWithUnsplitSignature script
+signDigest:
+	cast wallet sign --no-hash 0x72030e6f8a1f71c69d8cc6b6aed9da40dbd003ef50c3ba0549f0d0afffafb211 --private-key $(DEFAULT_ANVIL_KEY)
