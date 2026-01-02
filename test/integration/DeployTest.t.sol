@@ -33,11 +33,32 @@ contract DeployTest is Test, CodeConstants {
         assertEq(airdropToken.balanceOf(address(merkleAirdrop)), INITIAL_SUPPLY);
     }
 
-    function testMerkleRootWasSetCorrectly() public view {
+    function testAirdropTokenAddressWasSetCorrectly() public view {
+        assertEq(merkleAirdrop.getAirdropToken(), address(airdropToken));
+    }
+
+    function testMerkleRootWasSetCorrectlyOnLocalChain() public view {
+        assertEq(config.account, ANVIL_DEFAULT_ACCOUNT);
+        assertEq(config.merkleRoot, LOCAL_MERKLE_ROOT);
+        assertEq(config.merkleProof, LOCAL_MERKLE_PROOF);
+
         assertEq(merkleAirdrop.getMerkleRoot(), LOCAL_MERKLE_ROOT);
     }
 
-    function testAirdropTokenAddressWasSetCorrectly() public view {
-        assertEq(merkleAirdrop.getAirdropToken(), address(airdropToken));
+    function testMerkleRootWasSetCorrectly() public {
+        // get rpc url from .env
+        string memory arbSepoliaRpcUrl = vm.envString("ARB_SEPOLIA_RPC_URL");
+        // create and switch to forked blockchain
+        vm.createSelectFork(arbSepoliaRpcUrl);
+        // deploy on forked chain
+        helperConfig = new HelperConfig();
+        config = helperConfig.getNetworkConfig();
+        deploy = new Deploy();
+        (airdropToken, merkleAirdrop) = deploy.run();
+        // verify merkle root
+        assertEq(config.account, vm.envAddress("DEFAULT_KEY_ADDRESS"));
+        assertEq(config.merkleRoot, MERKLE_ROOT);
+        assertEq(config.merkleProof, MERKLE_PROOF);
+        assertEq(merkleAirdrop.getMerkleRoot(), MERKLE_ROOT);
     }
 }
