@@ -14,6 +14,7 @@ fs_permissions = [
     { access = "read-write", path = "./script/target/input.json" },
     { access = "write", path = "./script/target/outputLocal.json" },
     { access = "write", path = "./script/target/output.json" },
+    { access = "read", path = "./script/target/signature.txt" },
     { access = "read", path = "./broadcast" },
     { access = "read", path = "./reports" },
 ]

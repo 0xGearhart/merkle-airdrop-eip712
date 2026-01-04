@@ -10,7 +10,7 @@ pragma solidity ^0.8.27;
  * @notice Token to be claimed from MerkleAirdrop
  */
 contract AirdropToken is ERC20 {
-    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) ERC20(_name, _symbol) {
-        _mint(msg.sender, _initialSupply);
+    constructor(string memory name, string memory symbol, uint256 initialSupply) ERC20(name, symbol) {
+        _mint(msg.sender, initialSupply);
     }
 }
