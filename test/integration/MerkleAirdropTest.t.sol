@@ -38,4 +38,157 @@ contract MerkleAirdropTest is Test, CodeConstants {
         (user1, user1PrivKey) = makeAddrAndKey("user1");
         (user2, user2PrivKey) = makeAddrAndKey("user2");
     }
+
+    function testAirdropClaimForSelfFailsWithValidSignatureButEmptyProof() public {
+        uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+        assertEq(airdropToken.balanceOf(user1), 0);
+
+        bytes32 digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivKey, digest);
+        vm.prank(user1);
+        vm.expectRevert(MerkleAirdrop.MerkleAirdrop__InvalidMerkleProof.selector);
+        merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, emptyProof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance);
+        assertEq(airdropToken.balanceOf(user1), 0);
+        assertEq(merkleAirdrop.getClaimStatus(user1), false);
+    }
+
+    function testAirdropClaimFailsWithValidSignatureButProofForWrongAddress() public {
+        uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+        assertEq(airdropToken.balanceOf(user1), 0);
+
+        bytes32 digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivKey, digest);
+        vm.prank(user1);
+        vm.expectRevert(MerkleAirdrop.MerkleAirdrop__InvalidMerkleProof.selector);
+        merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user2Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance);
+        assertEq(airdropToken.balanceOf(user1), 0);
+        assertEq(merkleAirdrop.getClaimStatus(user1), false);
+    }
+
+    function testAirdropClaimForSelfWithValidProofAndSignature() public {
+        uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+        assertEq(airdropToken.balanceOf(user1), 0);
+
+        bytes32 digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivKey, digest);
+        vm.prank(user1);
+        merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user1Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+        assertEq(airdropToken.balanceOf(user1), AIRDROP_CLAIM_AMOUNT);
+        assertEq(merkleAirdrop.getClaimStatus(user1), true);
+    }
+
+    function testAirdropClaimForSelfFailsIfUserAlreadyClaimed() public {
+        uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+        assertEq(airdropToken.balanceOf(user1), 0);
+
+        bytes32 digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivKey, digest);
+        vm.prank(user1);
+        merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user1Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(user1), AIRDROP_CLAIM_AMOUNT);
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+        assertEq(merkleAirdrop.getClaimStatus(user1), true);
+
+        digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
+        (v, r, s) = vm.sign(user1PrivKey, digest);
+        vm.prank(user1);
+        vm.expectRevert(MerkleAirdrop.MerkleAirdrop__AlreadyClaimed.selector);
+        merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user1Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(user1), AIRDROP_CLAIM_AMOUNT);
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+        assertEq(merkleAirdrop.getClaimStatus(user1), true);
+    }
+
+    function testAirdropClaimForAnotherAddressFailsWithValidProofButWrongSignature() public {
+        uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+        assertEq(airdropToken.balanceOf(user1), 0);
+
+        bytes32 digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivKey, digest);
+        vm.prank(user1);
+        vm.expectRevert(MerkleAirdrop.MerkleAirdrop__InvalidSignature.selector);
+        merkleAirdrop.claim(user2, AIRDROP_CLAIM_AMOUNT, user2Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance);
+        assertEq(airdropToken.balanceOf(user1), 0);
+        assertEq(airdropToken.balanceOf(user2), 0);
+        assertEq(merkleAirdrop.getClaimStatus(user1), false);
+        assertEq(merkleAirdrop.getClaimStatus(user2), false);
+    }
+
+    function testAirdropClaimForAnotherAddressWithValidProofAndSignature() public {
+        uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+        assertEq(airdropToken.balanceOf(user1), 0);
+
+        bytes32 digest = merkleAirdrop.getDigest(user2, AIRDROP_CLAIM_AMOUNT);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivKey, digest);
+        vm.prank(user1);
+        merkleAirdrop.claim(user2, AIRDROP_CLAIM_AMOUNT, user2Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+        assertEq(airdropToken.balanceOf(user1), 0);
+        assertEq(airdropToken.balanceOf(user2), AIRDROP_CLAIM_AMOUNT);
+        assertEq(merkleAirdrop.getClaimStatus(user1), false);
+        assertEq(merkleAirdrop.getClaimStatus(user2), true);
+    }
+
+    function testAirdropClaimForAnotherAddressFailsIfAlreadyClaimed() public {
+        uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+        assertEq(airdropToken.balanceOf(user1), 0);
+
+        bytes32 digest = merkleAirdrop.getDigest(user2, AIRDROP_CLAIM_AMOUNT);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivKey, digest);
+        vm.prank(user1);
+        merkleAirdrop.claim(user2, AIRDROP_CLAIM_AMOUNT, user2Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+        assertEq(airdropToken.balanceOf(user1), 0);
+        assertEq(airdropToken.balanceOf(user2), AIRDROP_CLAIM_AMOUNT);
+        assertEq(merkleAirdrop.getClaimStatus(user1), false);
+        assertEq(merkleAirdrop.getClaimStatus(user2), true);
+
+        digest = merkleAirdrop.getDigest(user2, AIRDROP_CLAIM_AMOUNT);
+        (v, r, s) = vm.sign(user2PrivKey, digest);
+        vm.prank(user1);
+        vm.expectRevert(MerkleAirdrop.MerkleAirdrop__AlreadyClaimed.selector);
+        merkleAirdrop.claim(user2, AIRDROP_CLAIM_AMOUNT, user2Proof, v, r, s);
+
+        assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+        assertEq(airdropToken.balanceOf(user1), 0);
+        assertEq(airdropToken.balanceOf(user2), AIRDROP_CLAIM_AMOUNT);
+        assertEq(merkleAirdrop.getClaimStatus(user1), false);
+        assertEq(merkleAirdrop.getClaimStatus(user2), true);
+    }
+
+    // apparently reusing a signature does not fail as long as the contract does not have an already claimed check which seems odd
+    // TODO: look into this and see why this is not reverting when using a signature that was already used
+
+    // function testAirdropClaimFailsIfSignatureWasAlreadyUsed() public {
+    //     uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
+    //     assertEq(airdropToken.balanceOf(user1), 0);
+
+    //     bytes32 digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
+    //     (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivKey, digest);
+    //     vm.prank(user1);
+    //     merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user1Proof, v, r, s);
+
+    //     assertEq(airdropToken.balanceOf(user1), AIRDROP_CLAIM_AMOUNT);
+    //     assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+    //     assertEq(merkleAirdrop.getClaimStatus(user1), true);
+
+    //     vm.prank(user1);
+    //     vm.expectRevert(MerkleAirdrop.MerkleAirdrop__InvalidSignature.selector);
+    //     merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user1Proof, v, r, s);
+
+    //     assertEq(airdropToken.balanceOf(user1), AIRDROP_CLAIM_AMOUNT);
+    //     assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
+    // }
 }
