@@ -167,28 +167,4 @@ contract MerkleAirdropTest is Test, CodeConstants {
         assertEq(merkleAirdrop.getClaimStatus(user1), false);
         assertEq(merkleAirdrop.getClaimStatus(user2), true);
     }
-
-    // apparently reusing a signature does not fail as long as the contract does not have an already claimed check which seems odd
-    // TODO: look into this and see why this is not reverting when using a signature that was already used
-
-    // function testAirdropClaimFailsIfSignatureWasAlreadyUsed() public {
-    //     uint256 startingMerkleBalance = airdropToken.balanceOf(address(merkleAirdrop));
-    //     assertEq(airdropToken.balanceOf(user1), 0);
-
-    //     bytes32 digest = merkleAirdrop.getDigest(user1, AIRDROP_CLAIM_AMOUNT);
-    //     (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivKey, digest);
-    //     vm.prank(user1);
-    //     merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user1Proof, v, r, s);
-
-    //     assertEq(airdropToken.balanceOf(user1), AIRDROP_CLAIM_AMOUNT);
-    //     assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
-    //     assertEq(merkleAirdrop.getClaimStatus(user1), true);
-
-    //     vm.prank(user1);
-    //     vm.expectRevert(MerkleAirdrop.MerkleAirdrop__InvalidSignature.selector);
-    //     merkleAirdrop.claim(user1, AIRDROP_CLAIM_AMOUNT, user1Proof, v, r, s);
-
-    //     assertEq(airdropToken.balanceOf(user1), AIRDROP_CLAIM_AMOUNT);
-    //     assertEq(airdropToken.balanceOf(address(merkleAirdrop)), startingMerkleBalance - AIRDROP_CLAIM_AMOUNT);
-    // }
 }
