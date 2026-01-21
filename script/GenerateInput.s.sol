@@ -3,7 +3,7 @@
 import {CodeConstants} from "./HelperConfig.s.sol";
 import {Script, console} from "forge-std/Script.sol";
 
-pragma solidity ^0.8.27;
+pragma solidity 0.8.33;
 
 // Merkle tree input file generator script
 contract GenerateInput is Script, CodeConstants {

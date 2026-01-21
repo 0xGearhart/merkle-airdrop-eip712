@@ -5,7 +5,7 @@ import {CodeConstants, HelperConfig} from "./HelperConfig.s.sol";
 import {DevOpsTools} from "@devops/DevOpsTools.sol";
 import {Script} from "forge-std/Script.sol";
 
-pragma solidity ^0.8.27;
+pragma solidity 0.8.33;
 
 contract ClaimAirdrop is Script, CodeConstants {
     MerkleAirdrop merkleAirdrop;

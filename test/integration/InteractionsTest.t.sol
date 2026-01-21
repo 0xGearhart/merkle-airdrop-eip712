@@ -9,7 +9,7 @@ import {MerkleAirdrop} from "../../src/MerkleAirdrop.sol";
 import {DevOpsTools} from "@devops/DevOpsTools.sol";
 import {Test} from "forge-std/Test.sol";
 
-pragma solidity ^0.8.27;
+pragma solidity 0.8.33;
 
 contract InteractionsTest is Test, CodeConstants {
     Deploy deploy;

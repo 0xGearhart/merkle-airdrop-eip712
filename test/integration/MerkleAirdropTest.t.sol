@@ -6,7 +6,7 @@ import {AirdropToken} from "../../src/AirdropToken.sol";
 import {MerkleAirdrop} from "../../src/MerkleAirdrop.sol";
 import {Test} from "forge-std/Test.sol";
 
-pragma solidity ^0.8.27;
+pragma solidity 0.8.33;
 
 contract MerkleAirdropTest is Test, CodeConstants {
     Deploy deploy;

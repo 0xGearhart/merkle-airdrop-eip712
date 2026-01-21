@@ -5,7 +5,7 @@ import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-pragma solidity ^0.8.27;
+pragma solidity 0.8.33;
 
 /**
  * @title MerkleAirdrop

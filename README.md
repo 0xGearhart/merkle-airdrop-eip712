@@ -44,7 +44,7 @@ A gas-efficient airdrop distribution system using Merkle trees to verify claim e
 - **Multi-network Support**: Deployable on Ethereum, Arbitrum, and Base networks
 
 **Tech Stack:**
-- Solidity ^0.8.27
+- Solidity 0.8.33
 - Foundry (Forge for building and testing)
   - forge-std version (v1.11.0)
 - OpenZeppelin Contracts (ERC20, EIP-712, Merkle proof utilities, ECDSA signature recovery)
@@ -99,7 +99,7 @@ A gas-efficient airdrop distribution system using Merkle trees to verify claim e
 
 **Repository Structure:**
 ```
-foundry-airdrop-merkle-eip712/
+merkle-airdrop-eip712/
 ├── src/
 │   ├── AirdropToken.sol              # ERC20 token for airdrop
 │   └── MerkleAirdrop.sol             # Core airdrop claim contract with EIP-712
@@ -136,8 +136,8 @@ foundry-airdrop-merkle-eip712/
 ### Quickstart
 
 ```bash
-git clone https://github.com/0xGearhart/foundry-airdrop-merkle-eip712
-cd foundry-airdrop-merkle-eip712
+git clone https://github.com/0xGearhart/merkle-airdrop-eip712
+cd merkle-airdrop-eip712
 make
 ```
 

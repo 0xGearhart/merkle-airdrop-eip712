@@ -2,7 +2,7 @@
 
 import {Script} from "forge-std/Script.sol";
 
-pragma solidity ^0.8.27;
+pragma solidity 0.8.33;
 
 contract CodeConstants {
     // airdrop token contract info

@@ -5,7 +5,7 @@ import {stdJson} from "forge-std/StdJson.sol";
 import {ScriptHelper} from "murky/script/common/ScriptHelper.sol";
 import {Merkle} from "murky/src/Merkle.sol";
 
-pragma solidity ^0.8.27;
+pragma solidity 0.8.33;
 
 // Merkle proof generator script
 // To use:
