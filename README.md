@@ -138,8 +138,7 @@ foundry-airdrop-merkle-eip712/
 ```bash
 git clone https://github.com/0xGearhart/foundry-airdrop-merkle-eip712
 cd foundry-airdrop-merkle-eip712
-make install
-forge build
+make
 ```
 
 ### Environment Setup
