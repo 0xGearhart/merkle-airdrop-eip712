@@ -223,6 +223,12 @@ Generate coverage report:
 forge coverage
 ```
 
+Create test coverage report and save to .txt file:
+
+```bash
+make coverage-report
+```
+
 ### Deploy Locally
 
 Start a local Anvil node:
@@ -390,7 +396,7 @@ This protocol does **not** implement role-based access control through OpenZeppe
 Generate a gas report for this project:
 
 ```bash
-forge test --gas-report
+make gas-report
 ```
 
 Generate gas snapshot:
