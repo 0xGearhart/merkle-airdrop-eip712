@@ -1,10 +1,10 @@
 -include .env
 
-.PHONY: all clean remove install update snapshot coverage-report gas-report anvil deploy claim-airdrop get-digest sign-digest merkle claim-airdrop-with-full-sig split-signature
+.PHONY: all clean remove install snapshot coverage-report gas-report anvil deploy claim-airdrop get-digest sign-digest merkle claim-airdrop-with-full-sig split-signature
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
-all: clean remove install update build
+all: clean remove install build
 
 # Clean the repo
 clean  :; forge clean
@@ -13,9 +13,6 @@ clean  :; forge clean
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
 install :; forge install cyfrin/foundry-devops@0.2.2 && forge install foundry-rs/forge-std@v1.11.0 && forge install openzeppelin/openzeppelin-contracts@v5.5.0 && forge install dmfxyz/murky@v0.1.0
-
-# Update Dependencies
-update:; forge update
 
 # Create test coverage report and save to .txt file
 coverage-report :; forge coverage --report debug > coverage.txt
